@@ -1,20 +1,76 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React, {useState, useEffect} from "react";
+import {View, StyleSheet, Image, TouchableOpacity} from 'react-native';
+import Torch from "react-native-torch";
+import RNShake from 'react-native-shake';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
+const App = () => {
+  const [toggle, setToggle] = useState(false);  
+  const handleChangeToggle = () => setToggle(oldToggle => !oldToggle);
+
+  useEffect(() =>{
+     Torch.switchState(toggle);
+  }, [toggle]);
+
+  useEffect(() => {
+    const subscript = RNShake.addListener(() =>{
+      handleChangeToggle();
+      setToggle(oldToggle => !oldToggle);
+    });
+    return () => subscript.remove();
+  }, []);
+
+  return(
+     <View style={toggle ? style.containerlight : style.container}>
+      <TouchableOpacity onPress={handleChangeToggle}>
+
+        <Image style={toggle ? style.lighton : style.lightoff} 
+        source={
+          toggle
+          ?require('./assets/eco-light.png')
+          :require('./assets/eco-light-off.png')} />
+
+        <Image style={style.dioLogo} 
+          source={
+            toggle
+            ?require('./assets/logo-dio.png')
+            :require('./assets/logo-dio-white.png')} />
+            </TouchableOpacity>
     </View>
   );
-}
+}; 
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default App;
+
+const style = StyleSheet.create({
+  
+  container: {flex: 1,
+  backgroundColor: 'black',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+containerlight: {flex: 1,
+  backgroundColor: 'white',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+lighton:{
+  resizeMode: 'contain',
+  alignSelf: 'center',
+  height: 150,
+  width: 150,
+},
+lightoff:{
+  resizeMode: 'contain',
+  alignSelf: 'center',
+  tintColor: 'white',
+  height: 150,
+  width: 150,
+},
+dioLogo: {
+  resizeMode: 'contain',
+  alignSelf: 'center',
+  height: 250,
+  width: 250,
+}
+})
